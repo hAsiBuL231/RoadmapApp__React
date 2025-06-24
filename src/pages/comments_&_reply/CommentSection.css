@@ -129,6 +129,25 @@
   margin-bottom: 1rem;
 }
 
+ /* logged-out states */
+.comment-login-prompt {
+  text-align: center;
+  padding: 1.5rem;
+  background-color: var(--light);
+  border-radius: var(--border-radius);
+  margin-bottom: 1.5rem;
+}
+
+.comment-login-prompt a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.comment-login-prompt a:hover {
+  text-decoration: underline;
+}
+
 @keyframes spin {
   to { transform: rotate(360deg); }
 }

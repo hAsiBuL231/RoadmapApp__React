@@ -30,6 +30,9 @@ export const authService = {
     getCurrentUser: async () => {
         try {
             const response = await API.get(API_ENDPOINTS.auth.me);
+            if (response.data) {
+                localStorage.setItem("userInfo", JSON.stringify(response.data));
+            }
             return response.data;
         } catch (error) {
             console.error("Get current user error:", error);
@@ -39,6 +42,7 @@ export const authService = {
 
     logout: () => {
         localStorage.removeItem("token");
+        localStorage.removeItem("userInfo");
     }
 };
 

@@ -16,7 +16,10 @@ function LoginForm() {
         try {
             //const response = await axios.post("http://127.0.0.1:5000/auth/login", { "email": email, "password": password }, { headers: { 'Content-Type': 'application/json' } });
             await authService.login({ email, password });
-            setMessage("Login successful!");
+            setMessage("Login successful! Redirecting to RoadMap App...");
+            
+            await authService.getCurrentUser();
+
             // Redirect after short delay to show success message
             setTimeout(() => window.location.href = "/roadmap", 1000);
         } catch (error) {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import CommentSection from "../comments_&_reply/CommentSection";
 import "./Roadmap.css";
-import { roadmapService } from "../../utils/apiService";
+import { roadmapService, authService } from "../../utils/apiService";
 
 function Roadmap() {
   const [roadmap, setRoadmap] = useState([]);
@@ -9,6 +9,16 @@ function Roadmap() {
   const [activeTab, setActiveTab] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [filter] = useState('all');
+  const [currentUser, setCurrentUser] = useState(null); // Add currentUser state
+
+
+  useEffect(() => {
+    const userData = localStorage.getItem("userInfo");
+    if (userData) {
+      setCurrentUser(JSON.parse(userData));
+    }
+  }, []);
+
 
   useEffect(() => {
     const fetchRoadmap = async () => {
@@ -25,6 +35,7 @@ function Roadmap() {
     };
     fetchRoadmap();
   }, [filter, searchTerm]);
+
 
   const handleUpvote = async (itemId) => {
     try {
@@ -47,6 +58,15 @@ function Roadmap() {
     }
   };
 
+
+  const handleLogout = () => {
+    if (window.confirm("Are you sure you want to log out?")) {
+      authService.logout();
+      setTimeout(() => window.location.href = "/login", 100);
+    }
+  };
+
+
   const filteredItems = roadmap.filter(item => {
     const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.description?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -62,8 +82,22 @@ function Roadmap() {
   return (
     <div className="roadmap-container">
       <header className="roadmap-header">
-        <h1>Product Roadmap</h1>
-        <p>Track upcoming features and improvements</p>
+        <div className="header-wrapper">
+          {currentUser && (
+            <div className="user-controls">
+              <span className="welcome-message">Welcome, {currentUser.email.split("@")[0]}</span>
+              <button onClick={handleLogout} className="logout-btn">
+                Logout
+              </button>
+            </div>
+          )}
+
+          <div className="header-content">
+            <h1>Product Roadmap</h1>
+            <p>Track upcoming features and improvements</p>
+          </div>
+        </div>
+
 
         <div className="roadmap-controls">
           <div className="search-box">
@@ -131,7 +165,7 @@ function Roadmap() {
                 </div>
               </div>
 
-              <CommentSection itemId={item.id} />
+              <CommentSection itemId={item.id} currentUser={localStorage.getItem("userInfo") ? JSON.parse(localStorage.getItem("userInfo")) : null} />
             </div>
           ))}
         </div>

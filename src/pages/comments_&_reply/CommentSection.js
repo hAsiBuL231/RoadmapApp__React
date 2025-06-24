@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import API from "../../utils/api";
+import { commentService, replyService } from "../../utils/apiService";
 import CommentItem from "./CommentItem";
 import "./CommentSection.css";
 
@@ -17,13 +17,9 @@ function CommentSection({ itemId, currentUser }) {
     setIsLoading(prev => ({ ...prev, comments: true }));
     setError(null);
     try {
-      const res = await API.get(`/comments/${itemId}`);
-      // Ensure each comment has a replies array
-      const commentsWithReplies = res.data.map(comment => ({
-        ...comment,
-        replies: comment.replies || []
-      }));
-      setComments(commentsWithReplies);
+      const comments = await commentService.getByItem(itemId);
+      console.log("Fetched comments:", comments);
+      setComments(comments);
     } catch (err) {
       setError("Failed to load comments. Please try again.");
       console.error("Error fetching comments:", err);
@@ -38,15 +34,11 @@ function CommentSection({ itemId, currentUser }) {
 
     setIsLoading(prev => ({ ...prev, posting: true }));
     try {
-      const response = await API.post("/comment", {
-        item_id: itemId,
-        text: newComment,
-        user_id: currentUser?.id
-      });
+      const comment = await commentService.create(itemId, newComment);
       setNewComment("");
-      setComments(prev => [response.data, ...prev]);
+      setComments(prev => [comment, ...prev]);
     } catch (err) {
-      setError("Failed to post comment. Please try again.");
+      setError(err.response?.data?.message || "Failed to post comment. Please try again.");
       console.error("Error posting comment:", err);
     } finally {
       setIsLoading(prev => ({ ...prev, posting: false }));
@@ -55,28 +47,11 @@ function CommentSection({ itemId, currentUser }) {
 
   const handleEditComment = async (commentId, text, parentId = null) => {
     try {
-      const updatedComment = await API.put(`/comments/${commentId}`, { text });
-
-      setComments(prev => {
-        if (parentId) {
-          return prev.map(comment =>
-            comment.id === parentId
-              ? {
-                ...comment,
-                replies: comment.replies.map(reply =>
-                  reply.id === commentId ? updatedComment.data : reply
-                )
-              }
-              : comment
-          );
-        } else {
-          return prev.map(comment =>
-            comment.id === commentId ? updatedComment.data : comment
-          );
-        }
-      });
+      const updatedComment = await commentService.update(commentId, text);
+      console.log("Updated comment:", updatedComment);
+      fetchComments();
     } catch (err) {
-      setError("Failed to update comment. Please try again.");
+      setError(err.response?.data?.message || "Failed to update comment. Please try again.");
       console.error("Error editing comment:", err);
     }
   };
@@ -85,7 +60,7 @@ function CommentSection({ itemId, currentUser }) {
     if (!window.confirm("Are you sure you want to delete this comment?")) return;
 
     try {
-      await API.delete(`/comments/${commentId}`);
+      await commentService.delete(commentId);
       setComments(prev => {
         if (parentId) {
           return prev.map(comment =>
@@ -101,32 +76,28 @@ function CommentSection({ itemId, currentUser }) {
         }
       });
     } catch (err) {
-      setError("Failed to delete comment. Please try again.");
+      setError(err.response?.data?.message || "Failed to delete comment. Please try again.");
       console.error("Error deleting comment:", err);
     }
   };
 
-  const handleReply = async (parentId, text) => {
+  const handleReply = async (parentId, text, depth = 1) => {
     setReplyingStates(prev => ({ ...prev, [parentId]: true }));
     try {
-      const response = await API.post("/reply", {
-        parent_id: parentId,
-        text,
-        user_id: currentUser?.id
-      });
+      const reply = await replyService.create(parentId, text, depth);
 
       setComments(prev =>
         prev.map(comment =>
           comment.id === parentId
             ? {
               ...comment,
-              replies: [...(comment.replies || []), response.data]
+              replies: [...(comment.replies || []), reply]
             }
             : comment
         )
       );
     } catch (err) {
-      setError("Failed to post reply. Please try again.");
+      setError(err.response?.data?.message || "Failed to post reply. Please try again.");
       console.error("Error posting reply:", err);
     } finally {
       setReplyingStates(prev => ({ ...prev, [parentId]: false }));
@@ -144,34 +115,36 @@ function CommentSection({ itemId, currentUser }) {
         {error && <div className="comment-error">{error}</div>}
       </header>
 
-      <form className="comment-form" onSubmit={handleSubmitComment}>
-        <div className="comment-form-group">
-          <textarea
-            className="comment-input"
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Share your thoughts..."
-            maxLength={500}
-            rows={3}
-            aria-label="Write a comment"
-            disabled={isLoading.posting}
-          />
-          <div className="comment-form-footer">
-            <span className="character-count">{newComment.length}/500</span>
-            <button
-              type="submit"
-              className="submit-button"
-              disabled={!newComment.trim() || isLoading.posting}
-            >
-              {isLoading.posting ? (
-                <span className="loading-dots">Posting</span>
-              ) : (
-                "Post Comment"
-              )}
-            </button>
+      {currentUser && (
+        <form className="comment-form" onSubmit={handleSubmitComment}>
+          <div className="comment-form-group">
+            <textarea
+              className="comment-input"
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Share your thoughts..."
+              maxLength={500}
+              rows={3}
+              aria-label="Write a comment"
+              disabled={isLoading.posting}
+            />
+            <div className="comment-form-footer">
+              <span className="character-count">{newComment.length}/500</span>
+              <button
+                type="submit"
+                className="submit-button"
+                disabled={!newComment.trim() || isLoading.posting}
+              >
+                {isLoading.posting ? (
+                  <span className="loading-dots">Posting</span>
+                ) : (
+                  "Post Comment"
+                )}
+              </button>
+            </div>
           </div>
-        </div>
-      </form>
+        </form>
+      )}
 
       {isLoading.comments && comments.length === 0 ? (
         <div className="loading-state">
@@ -180,7 +153,7 @@ function CommentSection({ itemId, currentUser }) {
         </div>
       ) : comments.length === 0 ? (
         <div className="empty-state">
-          <p>No comments yet. Be the first to share your thoughts!</p>
+          <p>No comments yet. {currentUser ? "Be the first to share your thoughts!" : "Log in to leave a comment."}</p>
         </div>
       ) : (
         <ul className="comment-list">

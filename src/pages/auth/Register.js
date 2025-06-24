@@ -15,8 +15,11 @@ function RegisterForm() {
     try {
       //const response = await axios.post("http://127.0.0.1:5000/auth/register", { "email": email, "password": password }, {headers: {'Content-Type': 'application/json'}} );
       await authService.register({ email, password });
-      setMessage("Registration successful! Redirecting to login...");
-      setTimeout(() => window.location.href = "/login", 1500);
+      setMessage("Registration successful! Redirecting to RoadMap App...");
+
+      await authService.getCurrentUser();
+
+      setTimeout(() => window.location.href = "/roadmap", 1500);
     } catch (error) {
       setMessage(
         error.response?.data?.message ||

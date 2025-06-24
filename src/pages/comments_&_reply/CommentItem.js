@@ -6,9 +6,9 @@ function CommentItem({ comment, currentUser, onEdit, onDelete, onReply }) {
   const [editText, setEditText] = useState(comment.text);
   const [replyText, setReplyText] = useState("");
   const [showReply, setShowReply] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
 
-  const isOwner = currentUser?.id === comment.user.id;
+  const isOwner = currentUser?.id === comment.user?.id;
   const hasReplies = comment.replies?.length > 0;
 
   const handleSaveEdit = () => {
@@ -27,12 +27,13 @@ function CommentItem({ comment, currentUser, onEdit, onDelete, onReply }) {
       <div className="comment-header">
         <div className="comment-author">
           <img 
-            src={comment.user.avatar || "/default-avatar.png"} 
-            alt={comment.user.name} 
+            src={comment.user?.avatar || "/default-avatar.png"} 
+            alt={comment.user?.name} 
             className="avatar"
+            style={{ width: "40px", height: "40px", borderRadius: "50%" }}
           />
           <div>
-            <span className="author-name">{comment.user.name}</span>
+            <span className="author-name">{comment.user?.name}</span>
             <span className="comment-time">
               {new Date(comment.created_at).toLocaleString()}
             </span>
