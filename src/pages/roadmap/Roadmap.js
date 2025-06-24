@@ -1,32 +1,34 @@
 import { useEffect, useState } from "react";
-import API from "../utils/api";
-import CommentSection from "./comments_&_reply/CommentSection";
+import CommentSection from "../comments_&_reply/CommentSection";
 import "./Roadmap.css";
+import { roadmapService } from "../../utils/apiService";
 
 function Roadmap() {
   const [roadmap, setRoadmap] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [filter] = useState('all');
 
   useEffect(() => {
     const fetchRoadmap = async () => {
       setIsLoading(true);
       try {
-        const response = await API.get("/roadmap");
-        setRoadmap(response.data);
+        const items = await roadmapService.getAllItems(filter, searchTerm);
+        setRoadmap(items);
       } catch (error) {
         console.error("Failed to fetch roadmap items", error);
+        alert("Failed to load roadmap items. Please try again.");
       } finally {
         setIsLoading(false);
       }
     };
     fetchRoadmap();
-  }, []);
+  }, [filter, searchTerm]);
 
   const handleUpvote = async (itemId) => {
     try {
-      await API.post(`/upvote/${itemId}`, {});
+      await roadmapService.upvoteItem(itemId);
       setRoadmap(prev =>
         prev.map(item =>
           item.id === itemId ? { ...item, upvotes: item.upvotes + 1, hasUpvoted: true } : item
@@ -40,7 +42,7 @@ function Roadmap() {
       } else if (error.response?.status === 404) {
         alert("Item not found.");
       } else {
-        alert("Upvote failed. Try again.");
+        alert("Upvote failed. Please try again.");
       }
     }
   };

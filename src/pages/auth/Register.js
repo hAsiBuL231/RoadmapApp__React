@@ -1,7 +1,7 @@
 import { useState } from "react";
-import axios from "axios";
+// import axios from "axios";
 import "./Register.css";
-import { register } from "../../utils/apiService";
+import { authService } from "../../utils/apiService";
 
 function RegisterForm() {
   const [email, setEmail] = useState("");
@@ -14,12 +14,15 @@ function RegisterForm() {
     setIsLoading(true);
     try {
       //const response = await axios.post("http://127.0.0.1:5000/auth/register", { "email": email, "password": password }, {headers: {'Content-Type': 'application/json'}} );
-      await register({ "email": email, "password": password });
-
-      setMessage("User registered successfully!");
-      window.location.href = "/Login";
+      await authService.register({ email, password });
+      setMessage("Registration successful! Redirecting to login...");
+      setTimeout(() => window.location.href = "/login", 1500);
     } catch (error) {
-      setMessage(error.response?.data?.message || error.message); //"Registration failed!"
+      setMessage(
+        error.response?.data?.message ||
+        error.message ||
+        "Registration failed. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }

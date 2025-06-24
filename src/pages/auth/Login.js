@@ -1,7 +1,7 @@
 import { useState } from "react";
-import axios from "axios";
+// import axios from "axios";
 import "./Login.css";
-import { login } from "../../utils/apiService";
+import { authService } from "../../utils/apiService";
 
 function LoginForm() {
     const [email, setEmail] = useState("");
@@ -9,14 +9,16 @@ function LoginForm() {
     const [message, setMessage] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
+
     const handleLogin = async (e) => {
         e.preventDefault();
         setIsLoading(true);
         try {
             //const response = await axios.post("http://127.0.0.1:5000/auth/login", { "email": email, "password": password }, { headers: { 'Content-Type': 'application/json' } });
-            await login({ "email": email, "password": password });
+            await authService.login({ email, password });
             setMessage("Login successful!");
-            window.location.href = "/roadmap";
+            // Redirect after short delay to show success message
+            setTimeout(() => window.location.href = "/roadmap", 1000);
         } catch (error) {
             setMessage(error.response?.data?.message || "Invalid credentials!");
         } finally {
