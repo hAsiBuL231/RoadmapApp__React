@@ -1,70 +1,110 @@
-# Getting Started with Create React App
+# 🚀 Roadmap App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A collaborative roadmap platform where users can upvote predefined product milestones, leave feedback, and engage in threaded discussions.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## 🧩 Features
 
-### `npm start`
+- **Authentication:** Secure email/password login and signup using JWT
+- **Roadmap Viewer:** Predefined items with filtering by status
+- **Upvotes:** Users can upvote an item once to express support
+- **Comments & Replies:** 3-level nested discussions with edit/delete support
+- **Responsive UI:** Custom-designed interface using raw CSS, fully responsive
+- **Access Control:** Only authenticated users can upvote or participate in discussions
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## ⚙️ Technology Stack
 
-### `npm test`
+**Frontend:**
+- React (functional components, hooks)
+- Axios (API communication)
+- React Router DOM (navigation)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+**Backend:**
+- Flask + Flask-JWT-Extended (auth)
+- Flask-SQLAlchemy (ORM)
+- SQLite (development DB, easy migration-ready)
+- CORS, Bcrypt (security)
 
-### `npm run build`
+**Other:**
+- Raw CSS (responsive, clean design)
+- Git & GitHub for version control and deployment
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 🧠 Project Design Decisions
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- **Stack Choice:** React and Flask were chosen for their rapid development capability, modular structure, and flexibility.
+- **Data Model:** RoadmapItem, User, Comment, Reply, and Upvote tables—normalized for scalability.
+- **Comment Threads:** Implemented recursive rendering in React with a 3-level nesting limit for simplicity and performance.
+- **One-Upvote Logic:** Enforced with a database-level uniqueness constraint between user and roadmap item.
 
-### `npm run eject`
+---
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## 🧪 Getting Started
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Backend
+```bash
+cd roadmap-backend
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python app.py
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Frontend
+```bash
+cd roadmap-app
+npm install
+npm start
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+---
 
-## Learn More
+## 📁 Project Structure
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```
+├── roadmap-backend/
+│   ├── app.py
+│   └── ...
+├── roadmap-app/
+│   ├── src/
+│   │   ├── pages/
+│   │   │   ├── auth/
+│   │   │   ├── comments_&_reply/
+│   │   │   ├── roadmap/
+│   │   ├── components/
+│   │   └── utils/
+│   └── public/
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 🤝 Contributing
+Contributions are what make the open-source community such an amazing place to learn, inspire, and create.
+Pull requests are welcome.
 
-### Code Splitting
+#### How to Contribute:
+1. Fork the repo
+2. Create your feature branch (git checkout -b feature/your-feature)
+3. Commit your changes (git commit -m 'Add your feature')
+4. Push to the branch (git push origin feature/your-feature)
+5. Open a Pull Request
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## 🐛 Issues & Support
 
-### Analyzing the Bundle Size
+If you encounter bugs or have feature suggestions, please use the [Issues tab](https://github.com/your-username/womens-safety-app/issues).
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+----------
 
-### Making a Progressive Web App
+## 📜 License
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Distributed under the MIT License. See `LICENSE` for more information.
 
-### Advanced Configuration
+----------
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## 👨‍💻 Author
 
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+**MD Hasibul Hossain**  
+Dept. of Computer Science & Engineering  
+Comilla University
